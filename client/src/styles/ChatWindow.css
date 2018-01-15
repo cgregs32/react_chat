@@ -1,0 +1,18 @@
+.underline {
+  text-decoration: underline;
+}
+
+.main-window {
+  border: 3px solid black;
+  height: 60vh;
+  overflow-y: scroll;
+  background-color: lightblue;
+  border-radius: 10px;
+}
+
+.message-input{
+  border-radius: 10px;
+  margin: 0 auto;
+  width: 80%;
+  padding: 10px;
+}
