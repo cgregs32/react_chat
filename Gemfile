@@ -18,6 +18,8 @@ gem 'devise'
 # API JWT Token Auth
 gem 'devise_token_auth'
 
+gem 'jbuilder'
+
 group :development, :test do
   # Call 'pry' anywhere in the code to stop execution and get a debugger console
   gem 'pry', platforms: [:mri, :mingw, :x64_mingw]

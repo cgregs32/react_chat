@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import {setFlash} from '../actions/flash'
 import {Segment, Header, Form, TextArea, Button} from 'semantic-ui-react'
 import ChatMessage from './ChatMessage'
-import {addMessage} from '../actions/messages'
+import {addMessage, fetchMessages} from '../actions/messages'
 import axios from 'axios'
 import '../styles/ChatWindow.css'
 
@@ -11,12 +11,15 @@ class ChatWindow extends React.Component{
   state = { newMessage: '', loaded: false }
 
   componentDidMount() {
+    //todo scroll the user to the bottom of the div on mount
+    //scroll user to bottom of the div on new message
     window.MessageBus.start();
     const { dispatch } = this.props
+    dispatch(fetchMessages());
     dispatch(setFlash('Welcome To React Chat!', 'green'))
 
     window.MessageBus.subscribe('/chat_channel', (data) => {
-      dispatch(addMessage(JSON.parse(data)))
+      dispatch(addMessage(data))
     })
   }
 
@@ -33,6 +36,7 @@ class ChatWindow extends React.Component{
     axios.post('/api/messages', { message: { email, body: this.state.newMessage } })
       .then( res => {
         this.setState({ newMessage: '' });
+        dispatch({ headers: res.headers})
       })
       .catch( err => {
         dispatch(setFlash('Error Chatting. Try Again!', 'red'))
@@ -55,6 +59,12 @@ class ChatWindow extends React.Component{
       )
   }
 
+  checkSubmit = e => {
+    const { shiftKey, keyCode } = e
+    if (shiftKey && keyCode === 13)
+      this.refs.messageForm.handleSubmit(e);
+  }
+
   render(){
     return(
       <Segment basic>
@@ -63,13 +73,14 @@ class ChatWindow extends React.Component{
           { this.displayMessages() }
         </div>
         <div className='message-input'>
-          <Form onSubmit={ this.addMessage}>
+          <Form ref='messageForm' onSubmit={ this.addMessage}>
             <TextArea
               value={this.state.newMessage}
               onChange={this.handleChange}
               placeholder='Chat Message Here'
               autoFocus
               required
+              onKeyUp={this.checkSubmit}
             />
           <Segment basic textAlign='center'>
             <Button type='submit' primary>Send Message</Button>
